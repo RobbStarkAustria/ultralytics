@@ -1,15 +1,20 @@
 import os
 from ultralytics import YOLO
 
+import my_config
+
+classes_string = "_".join(my_config.classes_to_train).replace("-", "_")
+
 with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
 model = YOLO("yolov8x.pt")
 model.train(
-    data="./data/mi_d_mi_u.yaml",
-    project="hyper-parameter",
-    name="no-scale",
+    data=f"./data/{classes_string}.yaml",
+    project=f"{classes_string}",
+    # project="hyper-parameter",
+    name="initial",
     batch=2,
     patience=10,
     epochs=150,
@@ -41,6 +46,14 @@ model.train(
     copy_paste=0.0,
     )
 
+model.val(
+    save_txt=True,
+    save_conf=True,
+    device=0,
+    imgsz=1024,
+    batch=4,
+    iou=0.3,
+)
 
 os.unlink("watchdog.txt")
 print("watchdog sleeping")
