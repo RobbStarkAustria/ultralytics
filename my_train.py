@@ -16,7 +16,7 @@ model.train(
     # project="hyper-parameter",
     name="initial",
     batch=2,
-    patience=10,
+    patience=5,
     epochs=150,
     device=0,
     imgsz=1024,
@@ -44,9 +44,10 @@ model.train(
     mosaic=1.0,
     mixup=0.0,
     copy_paste=0.0,
-    )
+)
 
 model.val(
+    name="initial-val",
     save_txt=True,
     save_conf=True,
     device=0,
@@ -57,4 +58,3 @@ model.val(
 
 os.unlink("watchdog.txt")
 print("watchdog sleeping")
-
