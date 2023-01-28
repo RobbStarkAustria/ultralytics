@@ -18,8 +18,8 @@ import psutil
 import torch
 from IPython import display
 
-from ultralytics.yolo.utils import (AUTOINSTALL, FONT, LOGGER, ROOT, USER_CONFIG_DIR, TryExcept, colorstr, emojis,
-                                    is_colab, is_docker, is_jupyter)
+from ultralytics.yolo.utils import (AUTOINSTALL, FONT, LOGGER, ROOT, USER_CONFIG_DIR, TryExcept, colorstr, downloads,
+                                    emojis, is_colab, is_docker, is_jupyter)
 
 
 def is_ascii(s) -> bool:
@@ -123,9 +123,7 @@ def check_font(font: str = FONT, progress: bool = False) -> None:
     # Check if font file exists at the source or destination path
     if not font.exists() and not file.exists():
         # Download font file
-        url = f'https://ultralytics.com/assets/{font.name}'
-        LOGGER.info(f'Downloading {url} to {file}...')
-        torch.hub.download_url_to_file(url, str(file), progress=progress)
+        downloads.safe_download(file=file, url=f'https://ultralytics.com/assets/{font.name}', progress=progress)
 
 
 def check_online() -> bool:
@@ -207,17 +205,15 @@ def check_file(file, suffix=''):
     # Search/download file (if necessary) and return path
     check_suffix(file, suffix)  # optional
     file = str(file)  # convert to str()
-    if Path(file).is_file() or not file:  # exists
+    if not file or ('://' not in file and Path(file).is_file()):  # exists ('://' check required in Windows Python<3.10)
         return file
-    elif file.startswith(('http:/', 'https:/')):  # download
+    elif file.lower().startswith(('https://', 'http://', 'rtsp://', 'rtmp://')):  # download
         url = file  # warning: Pathlib turns :// -> :/
         file = Path(urllib.parse.unquote(file).split('?')[0]).name  # '%2F' to '/', split https://url.com/file.txt?auth
         if Path(file).is_file():
             LOGGER.info(f'Found {url} locally at {file}')  # file already exists
         else:
-            LOGGER.info(f'Downloading {url} to {file}...')
-            torch.hub.download_url_to_file(url, file)
-            assert Path(file).exists() and Path(file).stat().st_size > 0, f'File download failed: {url}'  # check
+            downloads.safe_download(file=file, url=url)
         return file
     else:  # search
         files = []
@@ -276,7 +272,7 @@ def git_describe(path=ROOT):  # path must be a directory
     try:
         assert (Path(path) / '.git').is_dir()
         return check_output(f'git -C {path} describe --tags --long --always', shell=True).decode()[:-1]
-    except Exception:
+    except AssertionError:
         return ''
 
 
