@@ -3,20 +3,23 @@ from ultralytics import YOLO
 
 import my_config
 
-classes_string = "_".join(my_config.classes_to_train).replace("-", "_")
+# classes_string = "_".join(my_config.classes_to_train).replace("-", "_")
+classes_string = "diamant_notes"
 
 with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
+
+name = "max_epochs"
 
 model = YOLO("yolov8x.pt")
 model.train(
     data=f"./data/{classes_string}.yaml",
     project=f"{classes_string}",
     # project="hyper-parameter",
-    name="initial",
+    name=f"{name}",
     batch=2,
-    patience=5,
+    patience=20,
     epochs=150,
     device=0,
     imgsz=1024,
@@ -47,13 +50,12 @@ model.train(
 )
 
 model.val(
-    name="initial-val",
+    name=f"{name}-val",
     save_txt=True,
     save_conf=True,
     device=0,
     imgsz=1024,
     batch=4,
-    iou=0.3,
 )
 
 os.unlink("watchdog.txt")
