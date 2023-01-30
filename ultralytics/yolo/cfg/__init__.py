@@ -90,7 +90,7 @@ def get_cfg(cfg: Union[str, Path, Dict, SimpleNamespace] = DEFAULT_CFG, override
 
     # Type checks
     for k in 'project', 'name':
-        if isinstance(cfg[k], (int, float)):
+        if k in cfg and isinstance(cfg[k], (int, float)):
             cfg[k] = str(cfg[k])
 
     # Return instance
@@ -176,7 +176,7 @@ def entrypoint(debug=False):
         'version': lambda: LOGGER.info(__version__),
         'settings': lambda: yaml_print(USER_CONFIG_DIR / 'settings.yaml'),
         'cfg': lambda: yaml_print(DEFAULT_CFG_PATH),
-        'copy-cfg': copy_default_config}
+        'copy-cfg': copy_default_cfg}
 
     overrides = {}  # basic overrides, i.e. imgsz=320
     for a in merge_equals_args(args):  # merge spaces around '=' sign
@@ -208,8 +208,8 @@ def entrypoint(debug=False):
         elif a in special:
             special[a]()
             return
-        elif a in DEFAULT_CFG_DICT and DEFAULT_CFG_DICT[a] is False:
-            overrides[a] = True  # auto-True for default False args, i.e. 'yolo show' sets show=True
+        elif a in DEFAULT_CFG_DICT and isinstance(DEFAULT_CFG_DICT[a], bool):
+            overrides[a] = True  # auto-True for default bool args, i.e. 'yolo show' sets show=True
         elif a in DEFAULT_CFG_DICT:
             raise SyntaxError(f"'{colorstr('red', 'bold', a)}' is a valid YOLO argument but is missing an '=' sign "
                               f"to set its value, i.e. try '{a}={DEFAULT_CFG_DICT[a]}'\n{CLI_HELP_MSG}")
@@ -221,7 +221,7 @@ def entrypoint(debug=False):
     task2data = dict(detect='coco128.yaml', segment='coco128-seg.yaml', classify='mnist160')
 
     # Mode
-    mode = overrides['mode']
+    mode = overrides.get('mode', None)
     if mode is None:
         mode = DEFAULT_CFG.mode or 'predict'
         LOGGER.warning(f"WARNING ⚠️ 'mode=' is missing. Valid modes are {modes}. Using default 'mode={mode}'.")
@@ -262,11 +262,12 @@ def entrypoint(debug=False):
             LOGGER.warning(f"WARNING ⚠️ 'format=' is missing. Using default 'format={overrides['format']}'.")
 
     # Run command in python
-    getattr(model, mode)(**overrides)
+    cfg = get_cfg(overrides=overrides)
+    getattr(model, mode)(**vars(cfg))
 
 
 # Special modes --------------------------------------------------------------------------------------------------------
-def copy_default_config():
+def copy_default_cfg():
     new_file = Path.cwd() / DEFAULT_CFG_PATH.name.replace('.yaml', '_copy.yaml')
     shutil.copy2(DEFAULT_CFG_PATH, new_file)
     LOGGER.info(f"{PREFIX}{DEFAULT_CFG_PATH} copied to {new_file}\n"

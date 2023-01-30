@@ -43,7 +43,7 @@ class SegmentationPredictor(DetectionPredictor):
         if len(im.shape) == 3:
             im = im[None]  # expand for batch dim
         self.seen += 1
-        if self.webcam or self.from_img:  # batch_size >= 1
+        if self.source_type.webcam or self.source_type.from_img:  # batch_size >= 1
             log_string += f'{idx}: '
             frame = self.dataset.count
         else:
@@ -110,7 +110,7 @@ def predict(cfg=DEFAULT_CFG, use_python=False):
         from ultralytics import YOLO
         YOLO(model)(**args)
     else:
-        predictor = SegmentationPredictor(args)
+        predictor = SegmentationPredictor(overrides=args)
         predictor.predict_cli()
 
 
