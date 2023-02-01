@@ -10,9 +10,9 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "max_epochs"
+name = "max_epochs_m_model"
 
-model = YOLO("yolov8x.pt")
+model = YOLO("yolov8m.pt")
 model.train(
     data=f"./data/{classes_string}.yaml",
     project=f"{classes_string}",

@@ -27,7 +27,7 @@ factor_of_augmentation = 3
 
 # notes to train
 classes_to_train = ["fu-d", "fu-u",
-                    "br-min", "sb-min",
+                    "sb-min",
                     "mi-d", "mi-u",
                     "sebre", "sm-d", "sm-u",
                     "sf-d", "sf-u"

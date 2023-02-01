@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO("diamant_notes/max_epochs/weights/best.pt")
+model = YOLO("diamant_notes/max_epochs_m_model/weights/best.pt")
 
 results = model.predict(
     source="test_images/bertani_4.jpg",
