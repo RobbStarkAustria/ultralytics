@@ -4,13 +4,13 @@ from ultralytics import YOLO
 import my_config
 
 # classes_string = "_".join(my_config.classes_to_train).replace("-", "_")
-classes_string = "diamant_notes"
+classes_string = "diamant_notes_seils"
 
 with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "max_epochs_m_model"
+name = "vmax_epochs_m_model_SGD"
 
 model = YOLO("yolov8m.pt")
 model.train(
@@ -23,9 +23,9 @@ model.train(
     epochs=150,
     device=0,
     imgsz=1024,
-    optimizer="Adam",
+    # optimizer="Adam",
     max_det=1000,
-    lr0=0.001,
+    lr0=0.01,
     cos_lr=True,
     augment=True,
     plots=True,
