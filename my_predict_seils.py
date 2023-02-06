@@ -1,10 +1,10 @@
 from ultralytics import YOLO
 
-model = YOLO("diamant_notes_seils/max_epochs_m_model/weights/best.pt")
+model = YOLO("diamant_notes/max_epochs_m_model/weights/best.pt")
 
 results = model.predict(
     source="seils_test/",
-    # device=0,
+    device="cpu",
     imgsz=1024,
     # batch=4,
     # conf=0.7,
@@ -15,7 +15,8 @@ results = model.predict(
     save_txt=True,
     save_conf=True,
     line_thickness=2,
-    hide_labels=True
+    hide_labels=True,
+    augment=False
     # agnostic_nms=True
 )
 warte = ""

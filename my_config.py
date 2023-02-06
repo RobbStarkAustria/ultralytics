@@ -25,10 +25,30 @@ factor_of_augmentation = 3
 #                     "sm-u", "sm-d", "sebre",
 #                     "li-lolu", "br-min", "sb-min", "n3"]
 
+note_group = ""
 # notes to train
-classes_to_train = ["fu-d", "fu-u",
-                    "sb-min",
-                    "mi-d", "mi-u",
-                    "sebre", "sm-d", "sm-u",
-                    "sf-d", "sf-u"
-                    ]
+# note_group ="diamant_notes"
+# classes_to_train = ["fu-d", "fu-u",
+#                     "sb-min",
+#                     "mi-d", "mi-u",
+#                     "sebre", "sm-d", "sm-u",
+#                     "sf-d", "sf-u"
+#                     ]
+
+# note_group = "rectangular_notes"
+# classes_to_train = ["li-lolu", "br-min",
+#                     "ma-d", "ma-u", "lo-u", "lo-d", "lo-l-d",
+#                     "bre"
+#                     ]
+
+# note_group = "rests"
+# classes_to_train = ["r-sm", "r-sb", "r-mi", "r-br", "r-lo", "r-fu", "r-ma"]
+
+# note_group = "extra_symbols"
+# classes_to_train = ["bar", "clef", "custos", "s-b",
+#                     "flat", "dot", "sharp", "nat",
+#                     "n3", "mens"
+#                     ]
+
+note_group = "staff"
+classes_to_train = ["staff"]

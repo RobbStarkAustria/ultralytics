@@ -442,7 +442,7 @@ class EarlyStopping:
             else:
                 ep = "epochs"
             
-            LOGGER.info(f"fitness does not improve for {delta} {ep}. patience: {self.patience}")
+            LOGGER.info(f"fitness does not improve from {self.best_fitness} for {delta} {ep}. patience: {self.patience}")
 
         if stop:
             LOGGER.info(f'Stopping training early as no improvement observed in last {self.patience} epochs. '
