@@ -44,11 +44,11 @@ note_group = ""
 # note_group = "rests"
 # classes_to_train = ["r-sm", "r-sb", "r-mi", "r-br", "r-lo", "r-fu", "r-ma"]
 
-# note_group = "extra_symbols"
-# classes_to_train = ["bar", "clef", "custos", "s-b",
-#                     "flat", "dot", "sharp", "nat",
-#                     "n3", "mens"
-#                     ]
+note_group = "extra_symbols"
+classes_to_train = ["bar", "clef", "custos", "s-b",
+                    "flat", "dot", "sharp", "nat",
+                    "n3", "mens"
+                    ]
 
-note_group = "staff"
-classes_to_train = ["staff"]
+# note_group = "staff"
+# classes_to_train = ["staff"]

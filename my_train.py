@@ -12,7 +12,7 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "baseline_m"
+name = "baseline_m_min_memory_aug_1"
 
 model = YOLO("yolov8m.pt")
 model.train(
@@ -20,7 +20,8 @@ model.train(
     project=f"{classes_string}",
     # project="hyper-parameter",
     name=f"{name}",
-    batch=4,
+    batch=-1,
+    min_memory=True,
     patience=20,
     epochs=150,
     device=0,
