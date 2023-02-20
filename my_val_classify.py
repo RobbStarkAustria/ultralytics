@@ -1,8 +1,8 @@
 from ultralytics import YOLO
 
-model = YOLO("runs/classify/train4/weights/best.pt")
-model.val(
-    data="../datasets/classify",
+model = YOLO("semiminima_down/baseline/weights/best.pt")
+metrics = model.val(
+    data="../Seils_imslp/",
     epochs=100,
     imgsz=224,
     batch=100,
@@ -10,3 +10,5 @@ model.val(
     save_txt=True,
     save_conf=True,
 )
+warte = ""
+print(metrics)
