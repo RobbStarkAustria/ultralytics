@@ -9,7 +9,7 @@ from ultralytics.nn.tasks import (ClassificationModel, DetectionModel, Segmentat
                                   guess_model_task, nn)
 from ultralytics.yolo.cfg import get_cfg
 from ultralytics.yolo.engine.exporter import Exporter
-from ultralytics.yolo.utils import DEFAULT_CFG, LOGGER, RANK, callbacks, yaml_load
+from ultralytics.yolo.utils import DEFAULT_CFG, DEFAULT_CFG_DICT, LOGGER, RANK, callbacks, yaml_load
 from ultralytics.yolo.utils.checks import check_file, check_imgsz, check_yaml
 from ultralytics.yolo.utils.downloads import GITHUB_ASSET_STEMS
 from ultralytics.yolo.utils.torch_utils import smart_inference_mode
@@ -32,7 +32,7 @@ class YOLO:
         YOLO (You Only Look Once) object detection model.
 
         Args:
-            model (str or Path): Path to the model file to load or create.
+            model (str, Path): Path to the model file to load or create.
             type (str): Type/version of models to use. Defaults to "v8".
 
         Attributes:
@@ -62,7 +62,7 @@ class YOLO:
             predict(source=None, stream=False, **kwargs): Perform prediction using the YOLO model.
 
         Returns:
-            List[ultralytics.yolo.engine.results.Results]: The prediction results.
+            list(ultralytics.yolo.engine.results.Results): The prediction results.
         """
 
     def __init__(self, model='yolov8n.pt', type='v8') -> None:
@@ -114,6 +114,7 @@ class YOLO:
         self.task = guess_model_task(cfg_dict)
         self.ModelClass, self.TrainerClass, self.ValidatorClass, self.PredictorClass = self._assign_ops_from_task()
         self.model = self.ModelClass(cfg_dict, verbose=verbose and RANK == -1)  # initialize
+        self.overrides['model'] = self.cfg
 
     def _load(self, weights: str):
         """
@@ -202,9 +203,9 @@ class YOLO:
 
     @smart_inference_mode()
     def track(self, source=None, stream=False, **kwargs):
-        from ultralytics.tracker.track import register_tracker
+        from ultralytics.tracker import register_tracker
         register_tracker(self)
-        # bytetrack-based method needs low confidence predictions as input
+        # ByteTrack-based method needs low confidence predictions as input
         conf = kwargs.get('conf') or 0.1
         kwargs['conf'] = conf
         kwargs['mode'] = 'track'
@@ -235,6 +236,20 @@ class YOLO:
         self.metrics_data = validator.metrics
 
         return validator.metrics
+
+    @smart_inference_mode()
+    def benchmark(self, **kwargs):
+        """
+        Benchmark a model on all export formats.
+
+        Args:
+            **kwargs : Any other args accepted by the validators. To see all args check 'configuration' section in docs
+        """
+        from ultralytics.yolo.utils.benchmarks import run_benchmarks
+        overrides = self.model.args.copy()
+        overrides.update(kwargs)
+        overrides = {**DEFAULT_CFG_DICT, **overrides}  # fill in missing overrides keys with defaults
+        return run_benchmarks(model=self, imgsz=overrides['imgsz'], half=overrides['half'], device=overrides['device'])
 
     def export(self, **kwargs):
         """
