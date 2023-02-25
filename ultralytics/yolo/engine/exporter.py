@@ -208,12 +208,15 @@ class Exporter:
         self.file = file
         self.output_shape = tuple(y.shape) if isinstance(y, torch.Tensor) else tuple(tuple(x.shape) for x in y)
         self.pretty_name = self.file.stem.replace('yolo', 'YOLO')
+        description = f'Ultralytics {self.pretty_name} model' + f'trained on {Path(self.args.data).name}' \
+            if self.args.data else '(untrained)'
         self.metadata = {
-            'description': f'Ultralytics {self.pretty_name} model trained on {Path(self.args.data).name}',
+            'description': description,
             'author': 'Ultralytics',
             'license': 'GPL-3.0 https://ultralytics.com/license',
             'version': __version__,
             'stride': int(max(model.stride)),
+            'task': model.task,
             'names': model.names}  # model metadata
 
         LOGGER.info(f"\n{colorstr('PyTorch:')} starting from {file} with input shape {tuple(im.shape)} BCHW and "
@@ -289,7 +292,10 @@ class Exporter:
     @try_export
     def _export_onnx(self, prefix=colorstr('ONNX:')):
         # YOLOv8 ONNX export
-        check_requirements('onnx>=1.12.0')
+        requirements = ['onnx>=1.12.0']
+        if self.args.simplify:
+            requirements += ['onnxsim', 'onnxruntime-gpu' if torch.cuda.is_available() else 'onnxruntime']
+        check_requirements(requirements)
         import onnx  # noqa
 
         LOGGER.info(f'\n{prefix} starting export with onnx {onnx.__version__}...')
@@ -323,7 +329,6 @@ class Exporter:
         # Simplify
         if self.args.simplify:
             try:
-                check_requirements(('onnxsim', 'onnxruntime-gpu' if torch.cuda.is_available() else 'onnxruntime'))
                 import onnxsim
 
                 LOGGER.info(f'{prefix} simplifying with onnxsim {onnxsim.__version__}...')
@@ -505,9 +510,8 @@ class Exporter:
         try:
             import tensorflow as tf  # noqa
         except ImportError:
-            check_requirements(
-                f"tensorflow{'-macos' if MACOS else '-aarch64' if ARM64 else '' if torch.cuda.is_available() else '-cpu'}"
-            )
+            cuda = torch.cuda.is_available()
+            check_requirements(f"tensorflow{'-macos' if MACOS else '-aarch64' if ARM64 else '' if cuda else '-cpu'}")
             import tensorflow as tf  # noqa
         check_requirements(('onnx', 'onnx2tf', 'sng4onnx', 'onnxsim', 'onnx_graphsurgeon', 'tflite_support',
                             'onnxruntime-gpu' if torch.cuda.is_available() else 'onnxruntime'),
