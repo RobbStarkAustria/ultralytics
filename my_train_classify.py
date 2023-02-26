@@ -6,7 +6,7 @@ with open("watchdog.txt", "w") as f:
     print("watchdog ready!")
 
 model = YOLO("yolov8m-cls.pt")
-project = "mensuration"
+project = "clef"
 name = "baseline"
 model.train(
     project=project,

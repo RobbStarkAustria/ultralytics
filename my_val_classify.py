@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-model = YOLO("semiminima_down/baseline/weights/best.pt")
+model = YOLO("clef/baseline/weights/best.pt")
 metrics = model.val(
     data="../Seils_imslp/",
     epochs=100,
