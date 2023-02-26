@@ -12,7 +12,7 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "baseline_m_min_memory_aug_1"
+name = "2023_02_22_after_class_correction"
 
 model = YOLO("yolov8m.pt")
 model.train(

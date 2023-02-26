@@ -6,13 +6,13 @@ with open("watchdog.txt", "w") as f:
     print("watchdog ready!")
 
 model = YOLO("yolov8m-cls.pt")
-project = "semibrevis"
+project = "mensuration"
 name = "baseline"
 model.train(
     project=project,
     name=name,
     data="../datasets/classify",
-    epochs=500,
+    epochs=150,
     imgsz=224,
     batch=100,
     patience=20,
