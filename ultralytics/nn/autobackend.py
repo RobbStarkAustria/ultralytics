@@ -14,7 +14,7 @@ import torch
 import torch.nn as nn
 from PIL import Image
 
-from ultralytics.yolo.utils import LOGGER, ROOT, yaml_load
+from ultralytics.yolo.utils import LINUX, LOGGER, ROOT, yaml_load
 from ultralytics.yolo.utils.checks import check_requirements, check_suffix, check_version, check_yaml
 from ultralytics.yolo.utils.downloads import attempt_download_asset, is_url
 from ultralytics.yolo.utils.ops import xywh2xyxy
@@ -143,7 +143,12 @@ class AutoBackend(nn.Module):
             metadata = w.parent / 'metadata.yaml'
         elif engine:  # TensorRT
             LOGGER.info(f'Loading {w} for TensorRT inference...')
-            import tensorrt as trt  # https://developer.nvidia.com/nvidia-tensorrt-download
+            try:
+                import tensorrt as trt  # noqa https://developer.nvidia.com/nvidia-tensorrt-download
+            except ImportError:
+                if LINUX:
+                    check_requirements('nvidia-tensorrt', cmds='-U --index-url https://pypi.ngc.nvidia.com')
+                import tensorrt as trt  # noqa
             check_version(trt.__version__, '7.0.0', hard=True)  # require tensorrt>=7.0.0
             if device.type == 'cpu':
                 device = torch.device('cuda:0')
@@ -179,7 +184,7 @@ class AutoBackend(nn.Module):
             LOGGER.info(f'Loading {w} for CoreML inference...')
             import coremltools as ct
             model = ct.models.MLModel(w)
-            metadata = model.user_defined_metadata
+            metadata = dict(model.user_defined_metadata)
         elif saved_model:  # TF SavedModel
             LOGGER.info(f'Loading {w} for TensorFlow SavedModel inference...')
             import tensorflow as tf
@@ -230,7 +235,7 @@ class AutoBackend(nn.Module):
         elif paddle:  # PaddlePaddle
             LOGGER.info(f'Loading {w} for PaddlePaddle inference...')
             check_requirements('paddlepaddle-gpu' if cuda else 'paddlepaddle')
-            import paddle.inference as pdi
+            import paddle.inference as pdi  # noqa
             w = Path(w)
             if not w.is_file():  # if not *.pdmodel
                 w = next(w.rglob('*.pdmodel'))  # get *.pdmodel file from *_paddle_model dir
@@ -251,20 +256,25 @@ class AutoBackend(nn.Module):
             nhwc = model.runtime.startswith("tensorflow")
             '''
         else:
-            from ultralytics.yolo.engine.exporter import EXPORT_FORMATS_TABLE
+            from ultralytics.yolo.engine.exporter import export_formats
             raise TypeError(f"model='{w}' is not a supported model format. "
                             'See https://docs.ultralytics.com/tasks/detection/#export for help.'
-                            f'\n\n{EXPORT_FORMATS_TABLE}')
+                            f'\n\n{export_formats()}')
 
         # Load external metadata YAML
         if isinstance(metadata, (str, Path)) and Path(metadata).exists():
             metadata = yaml_load(metadata)
         if metadata:
-            stride = int(metadata['stride'])
+            for k, v in metadata.items():
+                if k in ('stride', 'batch'):
+                    metadata[k] = int(v)
+                elif k in ('imgsz', 'names') and isinstance(v, str):
+                    metadata[k] = eval(v)
+            stride = metadata['stride']
             task = metadata['task']
-            batch = int(metadata['batch'])
-            imgsz = eval(metadata['imgsz']) if isinstance(metadata['imgsz'], str) else metadata['imgsz']
-            names = eval(metadata['names']) if isinstance(metadata['names'], str) else metadata['names']
+            batch = metadata['batch']
+            imgsz = metadata['imgsz']
+            names = metadata['names']
         elif not (pt or triton or nn_module):
             LOGGER.warning(f"WARNING ⚠️ Metadata not found for 'model={weights}'")
 
@@ -285,7 +295,7 @@ class AutoBackend(nn.Module):
             visualize (bool): whether to visualize the output predictions, defaults to False
 
         Returns:
-            (tuple): Tuple containing the raw output tensor, and the processed output for visualization (if visualize=True)
+            (tuple): Tuple containing the raw output tensor, and processed output for visualization (if visualize=True)
         """
         b, ch, h, w = im.shape  # batch, channel, height, width
         if self.fp16 and im.dtype != torch.float16:
