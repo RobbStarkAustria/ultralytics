@@ -5,9 +5,9 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-model = YOLO("yolov8m-cls.pt")
-project = "clef"
-name = "baseline"
+model = YOLO("mensuration/baseline/weights/best.pt")
+project = "mensuration"
+name = "all_notes"
 model.train(
     project=project,
     name=name,

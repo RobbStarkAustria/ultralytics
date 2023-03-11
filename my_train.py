@@ -12,9 +12,10 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "2023_02_22_after_class_correction"
+name = "2023_02_28_with_microfiches_transfer_aug_1_new_fitness"
 
-model = YOLO("yolov8m.pt")
+# model = YOLO("yolov8m.pt")
+model = YOLO("extra_symbols/baseline_m_min_memory_aug_1/weights/best.pt")
 model.train(
     data=f"./data/{classes_string}.yaml",
     project=f"{classes_string}",
