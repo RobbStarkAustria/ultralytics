@@ -1,13 +1,13 @@
 from ultralytics import YOLO
 
-model = YOLO("extra_symbols/max_epochs_m_model/weights/best.pt")
+model = YOLO("diamant_notes/2023_03_17_no_aug_no_patience/weights/best.pt")
 model.val(
-    data="./data/extra_symbols_val_seils.yaml",
+    data="data/diamant_notes.yaml",
     device=0,
     imgsz=1024,
-    batch=8,
+    batch=10,
     # conf=0.7,
-    save_json=True,
+    save_json=False,
     plots=True,
     # v5loader=True
 )

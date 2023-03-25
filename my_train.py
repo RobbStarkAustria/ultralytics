@@ -12,24 +12,29 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "2023_02_28_with_microfiches_transfer_aug_1_new_fitness"
+name = "2023_03_17_no_aug_no_patience"
 
-# model = YOLO("yolov8m.pt")
-model = YOLO("extra_symbols/baseline_m_min_memory_aug_1/weights/best.pt")
+# transfer_model = "yolov8m.pt"
+
+transfer_model = "rests/max_epochs_m_model/weights/best.pt"
+if my_config.note_group not in transfer_model:
+    print("check transfer model")
+    exit()
+
+model = YOLO(transfer_model)
 model.train(
     data=f"./data/{classes_string}.yaml",
     project=f"{classes_string}",
     # project="hyper-parameter",
     name=f"{name}",
-    batch=-1,
-    min_memory=True,
-    patience=20,
+    batch=5,
+    patience=0,
     epochs=150,
     device=0,
     imgsz=1024,
     optimizer="Adam",
     max_det=1000,
-    lr0=0.001,
+    lr0=0.0001,
     cos_lr=True,
     augment=False,
     plots=True,
@@ -42,25 +47,25 @@ model.train(
     hsv_s=0.7,
     hsv_v=0.4,
     degrees=0.0,
-    translate=0.1,
+    translate=0,
     scale=0.0,
     shear=0,
     perspective=0.0,
     flipud=0.0,
     fliplr=0.0,
-    mosaic=1.0,
+    mosaic=0.5,
     mixup=0.0,
     copy_paste=0.0,
 )
 
-model.val(
-    name=f"{name}-val",
-    save_txt=True,
-    save_conf=True,
-    device=0,
-    imgsz=1024,
-    batch=4,
-)
+# model.val(
+#     name=f"{name}-val",
+#     save_txt=True,
+#     save_conf=True,
+#     device=0,
+#     imgsz=1024,
+#     batch=4,
+# )
 
 os.unlink("watchdog.txt")
 print("watchdog sleeping")
