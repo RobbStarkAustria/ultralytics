@@ -1,10 +1,10 @@
 from ultralytics import YOLO
 
-model = YOLO("clef/baseline/weights/best.pt")
+model = YOLO("minima_down/all_notes_346/weights/best.pt")
 metrics = model.val(
-    data="../Seils_imslp/",
-    epochs=100,
-    imgsz=224,
+    data="../datasets/classify",
+    # epochs=100,
+    imgsz=352,
     batch=100,
     plots=True,
     save_txt=True,

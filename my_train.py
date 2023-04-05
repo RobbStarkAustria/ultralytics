@@ -5,21 +5,21 @@ import my_config
 
 classes_string = "_".join(my_config.classes_to_train).replace("-", "_")
 
-if len(my_config.note_group) >0:
-        classes_string = my_config.note_group
+if len(my_config.note_group) > 0:
+    classes_string = my_config.note_group
 
 with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "2023_03_17_no_aug_no_patience"
+name = "2023_04_02_AdamW_lr_e-6"
 
-# transfer_model = "yolov8m.pt"
+transfer_model = "yolov8m.pt"
 
-transfer_model = "rests/max_epochs_m_model/weights/best.pt"
-if my_config.note_group not in transfer_model:
-    print("check transfer model")
-    exit()
+# transfer_model = "rests/max_epochs_m_model/weights/best.pt"
+# if my_config.note_group not in transfer_model:
+#     print("check transfer model")
+#     exit()
 
 model = YOLO(transfer_model)
 model.train(
@@ -27,14 +27,14 @@ model.train(
     project=f"{classes_string}",
     # project="hyper-parameter",
     name=f"{name}",
-    batch=5,
+    batch=-1,
     patience=0,
-    epochs=150,
+    epochs=65,
     device=0,
     imgsz=1024,
-    optimizer="Adam",
+    optimizer="AdamW",
     max_det=1000,
-    lr0=0.0001,
+    lr0=0.000001,
     cos_lr=True,
     augment=False,
     plots=True,
