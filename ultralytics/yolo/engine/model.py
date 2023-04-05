@@ -1,6 +1,7 @@
 # Ultralytics YOLO 🚀, GPL-3.0 license
 
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Union
 
@@ -68,14 +69,16 @@ class YOLO:
         list(ultralytics.yolo.engine.results.Results): The prediction results.
     """
 
-    def __init__(self, model: Union[str, Path] = 'yolov8n.pt', task=None, session=None) -> None:
+    def __init__(self, model: Union[str, Path] = 'yolov8n.pt', task=None) -> None:
         """
         Initializes the YOLO model.
 
         Args:
-            model (str, Path): model to load or create
+            model (Union[str, Path], optional): Path or name of the model to load or create. Defaults to 'yolov8n.pt'.
+            task (Any, optional): Task type for the YOLO model. Defaults to None.
+
         """
-        self._reset_callbacks()
+        self.callbacks = deepcopy(callbacks.default_callbacks)
         self.predictor = None  # reuse predictor
         self.model = None  # model object
         self.trainer = None  # trainer object
@@ -85,10 +88,16 @@ class YOLO:
         self.ckpt_path = None
         self.overrides = {}  # overrides for trainer object
         self.metrics = None  # validation/training metrics
-        self.session = session  # HUB session
+        self.session = None  # HUB session
+        model = str(model).strip()  # strip spaces
+
+        # Check if Ultralytics HUB model from https://hub.ultralytics.com
+        if self.is_hub_model(model):
+            from ultralytics.hub.session import HUBTrainingSession
+            self.session = HUBTrainingSession(model)
+            model = self.session.model_file
 
         # Load or create new YOLO model
-        model = str(model).strip()  # strip spaces
         suffix = Path(model).suffix
         if not suffix and Path(model).stem in GITHUB_ASSET_STEMS:
             model, suffix = Path(model).with_suffix('.pt'), '.pt'  # add suffix, i.e. yolov8n -> yolov8n.pt
@@ -103,6 +112,13 @@ class YOLO:
     def __getattr__(self, attr):
         name = self.__class__.__name__
         raise AttributeError(f"'{name}' object has no attribute '{attr}'. See valid attributes below.\n{self.__doc__}")
+
+    @staticmethod
+    def is_hub_model(model):
+        return any((
+            model.startswith('https://hub.ultralytics.com/models/'),
+            [len(x) for x in model.split('_')] == [42, 20],  # APIKEY_MODELID
+            (len(model) == 20 and not Path(model).exists() and not any(x in model for x in './\\'))))  # MODELID
 
     def _new(self, cfg: str, task=None, verbose=True):
         """
@@ -212,9 +228,8 @@ class YOLO:
         if source is None:
             source = ROOT / 'assets' if is_git_dir() else 'https://ultralytics.com/images/bus.jpg'
             LOGGER.warning(f"WARNING ⚠️ 'source' is missing. Using 'source={source}'.")
-        is_cli = (sys.argv[0].endswith('yolo') or sys.argv[0].endswith('ultralytics')) and \
-                 ('predict' in sys.argv or 'mode=predict' in sys.argv)
-
+        is_cli = (sys.argv[0].endswith('yolo') or sys.argv[0].endswith('ultralytics')) and (
+            ('predict' in sys.argv or 'mode=predict' in sys.argv) or ('track' in sys.argv or 'mode=track' in sys.argv))
         overrides = self.overrides.copy()
         overrides['conf'] = 0.25
         overrides.update(kwargs)  # prefer kwargs
@@ -223,7 +238,7 @@ class YOLO:
         overrides['save'] = kwargs.get('save', False)  # not save files by default
         if not self.predictor:
             self.task = overrides.get('task') or self.task
-            self.predictor = TASK_MAP[self.task][3](overrides=overrides)
+            self.predictor = TASK_MAP[self.task][3](overrides=overrides, _callbacks=self.callbacks)
             self.predictor.setup_model(model=self.model, verbose=is_cli)
         else:  # only update args if predictor is already setup
             self.predictor.args = get_cfg(self.predictor.args, overrides)
@@ -280,6 +295,7 @@ class YOLO:
         from ultralytics.yolo.utils.benchmarks import benchmark
         overrides = self.model.args.copy()
         overrides.update(kwargs)
+        overrides['mode'] = 'benchmark'
         overrides = {**DEFAULT_CFG_DICT, **overrides}  # fill in missing overrides keys with defaults
         return benchmark(model=self, imgsz=overrides['imgsz'], half=overrides['half'], device=overrides['device'])
 
@@ -293,6 +309,7 @@ class YOLO:
         self._check_is_pytorch_model()
         overrides = self.overrides.copy()
         overrides.update(kwargs)
+        overrides['mode'] = 'export'
         args = get_cfg(cfg=DEFAULT_CFG, overrides=overrides)
         args.task = self.task
         if args.imgsz == DEFAULT_CFG.imgsz:
@@ -309,6 +326,11 @@ class YOLO:
             **kwargs (Any): Any number of arguments representing the training configuration.
         """
         self._check_is_pytorch_model()
+        if self.session:  # Ultralytics HUB session
+            if any(kwargs):
+                LOGGER.warning('WARNING ⚠️ using HUB training arguments, ignoring local training arguments.')
+            kwargs = self.session.train_args
+            self.session.check_disk_space()
         check_pip_update_available()
         overrides = self.overrides.copy()
         overrides.update(kwargs)
@@ -365,19 +387,17 @@ class YOLO:
         """
         return self.model.transforms if hasattr(self.model, 'transforms') else None
 
-    @staticmethod
-    def add_callback(event: str, func):
+    def add_callback(self, event: str, func):
         """
         Add callback
         """
-        callbacks.default_callbacks[event].append(func)
+        self.callbacks[event].append(func)
 
     @staticmethod
     def _reset_ckpt_args(args):
         include = {'imgsz', 'data', 'task', 'single_cls'}  # only remember these arguments when loading a PyTorch model
         return {k: v for k, v in args.items() if k in include}
 
-    @staticmethod
-    def _reset_callbacks():
+    def _reset_callbacks(self):
         for event in callbacks.default_callbacks.keys():
-            callbacks.default_callbacks[event] = [callbacks.default_callbacks[event][0]]
+            self.callbacks[event] = [callbacks.default_callbacks[event][0]]
