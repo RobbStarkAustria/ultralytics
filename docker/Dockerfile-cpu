@@ -1,4 +1,4 @@
-# Ultralytics YOLO 🚀, GPL-3.0 license
+# Ultralytics YOLO 🚀, AGPL-3.0 license
 # Builds ultralytics/ultralytics:latest-cpu image on DockerHub https://hub.docker.com/r/ultralytics/ultralytics
 # Image is CPU-optimized for ONNX, OpenVINO and PyTorch YOLOv8 deployments
 
@@ -26,7 +26,7 @@ ADD https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt /u
 
 # Install pip packages
 RUN python3 -m pip install --upgrade pip wheel
-RUN pip install --no-cache '.[export]' albumentations gsutil notebook \
+RUN pip install --no-cache . albumentations gsutil notebook tensorboard \
         --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Cleanup
