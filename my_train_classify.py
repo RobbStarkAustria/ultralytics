@@ -1,3 +1,4 @@
+from cuda_helpers import free_memory
 import os
 import sys
 
@@ -9,21 +10,20 @@ home_path = os.path.expanduser('~')
 
 sys.path.append(home_path + "/PycharmProjects/transfer_pytorch")
 
-from cuda_helpers import free_memory
 
 with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-model = YOLO("minima_up/baseline/weights/best.pt")
-project = "minima_up"
+model = YOLO("mensuration/baseline/weights/best.pt")
+project = "mensuration"
 name = "all_notes_352_0.0001"
 model.train(
     project=project,
     name=name,
     data="../datasets/classify",
     cache="ram",
-    epochs=150,
+    epochs=75,
     imgsz=352,
     batch=-1,
     patience=20,
@@ -52,8 +52,8 @@ model.train(
 )
 
 if torch.cuda.is_available():
-        free_memory(to_delete=["0"])
-        
+    free_memory(to_delete=["0"])
+
 model_path = os.path.join(project, name, "weights", "best.pt")
 calculate_validation(model_path)
 
