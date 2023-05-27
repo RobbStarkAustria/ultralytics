@@ -93,7 +93,7 @@ class BaseMixTransform:
             indexes = [indexes]
 
         # Get images information will be used for Mosaic or MixUp
-        mix_labels = [self.dataset.get_label_info(i) for i in indexes]
+        mix_labels = [self.dataset.get_image_and_label(i) for i in indexes]
 
         if self.pre_transform is not None:
             for i, data in enumerate(mix_labels):
@@ -135,12 +135,15 @@ class Mosaic(BaseMixTransform):
         super().__init__(dataset=dataset, p=p)
         self.dataset = dataset
         self.imgsz = imgsz
-        self.border = [-imgsz // 2, -imgsz // 2] if n == 4 else [-imgsz, -imgsz]
+        self.border = (-imgsz // 2, -imgsz // 2)  # width, height
         self.n = n
 
-    def get_indexes(self):
+    def get_indexes(self, buffer=True):
         """Return a list of random indexes from the dataset."""
-        return [random.randint(0, len(self.dataset) - 1) for _ in range(self.n - 1)]
+        if buffer:  # select images from buffer
+            return random.choices(list(self.dataset.buffer), k=self.n - 1)
+        else:  # select any images
+            return [random.randint(0, len(self.dataset) - 1) for _ in range(self.n - 1)]
 
     def _mix_transform(self, labels):
         """Apply mixup transformation to the input image and labels."""
@@ -224,10 +227,12 @@ class Mosaic(BaseMixTransform):
             img9[y1:y2, x1:x2] = img[y1 - padh:, x1 - padw:]  # img9[ymin:ymax, xmin:xmax]
             hp, wp = h, w  # height, width previous for next iteration
 
-            labels_patch = self._update_labels(labels_patch, padw, padh)
+            # Labels assuming imgsz*2 mosaic size
+            labels_patch = self._update_labels(labels_patch, padw + self.border[0], padh + self.border[1])
             mosaic_labels.append(labels_patch)
         final_labels = self._cat_labels(mosaic_labels)
-        final_labels['img'] = img9
+
+        final_labels['img'] = img9[-self.border[0]:self.border[0], -self.border[1]:self.border[1]]
         return final_labels
 
     @staticmethod
@@ -245,18 +250,20 @@ class Mosaic(BaseMixTransform):
             return {}
         cls = []
         instances = []
+        imgsz = self.imgsz * 2  # mosaic imgsz
         for labels in mosaic_labels:
             cls.append(labels['cls'])
             instances.append(labels['instances'])
         final_labels = {
             'im_file': mosaic_labels[0]['im_file'],
             'ori_shape': mosaic_labels[0]['ori_shape'],
-            'resized_shape': (self.imgsz * 2, self.imgsz * 2),
+            'resized_shape': (imgsz, imgsz),
             'cls': np.concatenate(cls, 0),
             'instances': Instances.concatenate(instances, axis=0),
             'mosaic_border': self.border}  # final_labels
-        clip_size = self.imgsz * (2 if self.n == 4 else 3)
-        final_labels['instances'].clip(clip_size, clip_size)
+        final_labels['instances'].clip(imgsz, imgsz)
+        good = final_labels['instances'].remove_zero_area_boxes()
+        final_labels['cls'] = final_labels['cls'][good]
         return final_labels
 
 
@@ -766,9 +773,17 @@ def v8_transforms(dataset, imgsz, hyp):
             pre_transform=LetterBox(new_shape=(imgsz, imgsz)),
         )])
     flip_idx = dataset.data.get('flip_idx', None)  # for keypoints augmentation
-    if dataset.use_keypoints and flip_idx is None and hyp.fliplr > 0.0:
-        hyp.fliplr = 0.0
-        LOGGER.warning("WARNING ⚠️ No `flip_idx` provided while training keypoints, setting augmentation 'fliplr=0.0'")
+    if dataset.use_keypoints:
+        kpt_shape = dataset.data.get('kpt_shape', None)
+        if flip_idx is None and hyp.fliplr > 0.0:
+            hyp.fliplr = 0.0
+            LOGGER.warning("WARNING ⚠️ No 'flip_idx' array defined in data.yaml, setting augmentation 'fliplr=0.0'")
+        elif flip_idx:
+            if len(flip_idx) != kpt_shape[0]:
+                raise ValueError(f'data.yaml flip_idx={flip_idx} length must be equal to kpt_shape[0]={kpt_shape[0]}')
+            elif flip_idx[0] != 0:
+                raise ValueError(f'data.yaml flip_idx={flip_idx} must be zero-index (start from 0)')
+
     return Compose([
         pre_transform,
         MixUp(dataset, pre_transform=pre_transform, p=hyp.mixup),
@@ -789,13 +804,20 @@ def classify_transforms(size=224, mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0)):  #
         return T.Compose([CenterCrop(size), ToTensor()])
 
 
+def hsv2colorjitter(h, s, v):
+    """Map HSV (hue, saturation, value) jitter into ColorJitter values (brightness, contrast, saturation, hue)"""
+    return v, v, s, h
+
+
 def classify_albumentations(
         augment=True,
         size=224,
         scale=(0.08, 1.0),
         hflip=0.5,
         vflip=0.0,
-        jitter=0.4,
+        hsv_h=0.015,  # image HSV-Hue augmentation (fraction)
+        hsv_s=0.7,  # image HSV-Saturation augmentation (fraction)
+        hsv_v=0.4,  # image HSV-Value augmentation (fraction)
         mean=(0.0, 0.0, 0.0),  # IMAGENET_MEAN
         std=(1.0, 1.0, 1.0),  # IMAGENET_STD
         auto_aug=False,
@@ -810,16 +832,15 @@ def classify_albumentations(
         if augment:  # Resize and crop
             T = [A.RandomResizedCrop(height=size, width=size, scale=scale)]
             if auto_aug:
-                # TODO: implement AugMix, AutoAug & RandAug in albumentation
+                # TODO: implement AugMix, AutoAug & RandAug in albumentations
                 LOGGER.info(f'{prefix}auto augmentations are currently not supported')
             else:
                 if hflip > 0:
                     T += [A.HorizontalFlip(p=hflip)]
                 if vflip > 0:
                     T += [A.VerticalFlip(p=vflip)]
-                if jitter > 0:
-                    jitter = float(jitter)
-                    T += [A.ColorJitter(jitter, jitter, jitter, 0)]  # brightness, contrast, saturation, 0 hue
+                if any((hsv_h, hsv_s, hsv_v)):
+                    T += [A.ColorJitter(*hsv2colorjitter(hsv_h, hsv_s, hsv_v))]  # brightness, contrast, saturation, hue
         else:  # Use fixed crop for eval set (reproducibility)
             T = [A.SmallestMaxSize(max_size=size), A.CenterCrop(height=size, width=size)]
         T += [A.Normalize(mean=mean, std=std), ToTensorV2()]  # Normalize and convert to Tensor

@@ -26,7 +26,7 @@ For more information about the Segment Anything Model and the SA-1B dataset, ple
 SAM can be used for a variety of downstream tasks involving object and image distributions beyond its training data. Examples include edge detection, object proposal generation, instance segmentation, and preliminary text-to-mask prediction. By employing prompt engineering, SAM can adapt to new tasks and data distributions in a zero-shot manner, making it a versatile and powerful tool for image segmentation tasks.
 
 ```python
-from ultralytics.vit import SAM
+from ultralytics import SAM
 
 model = SAM('sam_b.pt')
 model.info()  # display model information
@@ -57,7 +57,7 @@ Auto-annotation is an essential feature that allows you to generate a [segmentat
 To auto-annotate your dataset using the Ultralytics framework, you can use the `auto_annotate` function as shown below:
 
 ```python
-from ultralytics.yolo.data import auto_annotate
+from ultralytics.yolo.data.annotator import auto_annotate
 
 auto_annotate(data="path/to/images", det_model="yolov8x.pt", sam_model='sam_b.pt')
 ```
