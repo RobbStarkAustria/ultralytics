@@ -158,6 +158,7 @@ class Classify(nn.Module):
 
 
 class RTDETRDecoder(nn.Module):
+    export = False  # export mode
 
     def __init__(
             self,
@@ -246,9 +247,12 @@ class RTDETRDecoder(nn.Module):
                                               self.dec_score_head,
                                               self.query_pos_head,
                                               attn_mask=attn_mask)
-        if not self.training:
-            dec_scores = dec_scores.sigmoid_()
-        return dec_bboxes, dec_scores, enc_bboxes, enc_scores, dn_meta
+        x = dec_bboxes, dec_scores, enc_bboxes, enc_scores, dn_meta
+        if self.training:
+            return x
+        # (bs, 300, 4+nc)
+        y = torch.cat((dec_bboxes.squeeze(0), dec_scores.squeeze(0).sigmoid()), -1)
+        return y if self.export else (y, x)
 
     def _generate_anchors(self, shapes, grid_size=0.05, dtype=torch.float32, device='cpu', eps=1e-2):
         anchors = []
@@ -266,7 +270,7 @@ class RTDETRDecoder(nn.Module):
         anchors = torch.cat(anchors, 1)  # (1, h*w*nl, 4)
         valid_mask = ((anchors > eps) * (anchors < 1 - eps)).all(-1, keepdim=True)  # 1, h*w*nl, 1
         anchors = torch.log(anchors / (1 - anchors))
-        anchors = torch.where(valid_mask, anchors, torch.inf)
+        anchors = anchors.masked_fill(~valid_mask, float('inf'))
         return anchors, valid_mask
 
     def _get_encoder_input(self, x):
@@ -290,7 +294,7 @@ class RTDETRDecoder(nn.Module):
         bs = len(feats)
         # prepare input for decoder
         anchors, valid_mask = self._generate_anchors(shapes, dtype=feats.dtype, device=feats.device)
-        features = self.enc_output(torch.where(valid_mask, feats, 0))  # bs, h*w, 256
+        features = self.enc_output(valid_mask * feats)  # bs, h*w, 256
 
         enc_outputs_scores = self.enc_score_head(features)  # (bs, h*w, nc)
         # dynamic anchors + static content
