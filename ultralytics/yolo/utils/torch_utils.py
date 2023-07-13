@@ -232,7 +232,7 @@ def get_flops(model, imgsz=640):
 
 
 def get_flops_with_torch_profiler(model, imgsz=640):
-    # Compute model FLOPs (thop alternative)
+    """Compute model FLOPs (thop alternative)."""
     model = de_parallel(model)
     p = next(model.parameters())
     stride = (max(int(model.stride.max()), 32) if hasattr(model, 'stride') else 32) * 2  # max stride
@@ -319,9 +319,9 @@ def init_seeds(seed=0, deterministic=False):
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)  # for Multi-GPU, exception safe
     # torch.backends.cudnn.benchmark = True  # AutoBatch problem https://github.com/ultralytics/yolov5/issues/9287
-    if deterministic:  # https://github.com/ultralytics/yolov5/pull/8213
+    if deterministic:
         if TORCH_2_0:
-            torch.use_deterministic_algorithms(True)
+            torch.use_deterministic_algorithms(True, warn_only=True)  # warn if deterministic is not possible
             torch.backends.cudnn.deterministic = True
             os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
             os.environ['PYTHONHASHSEED'] = str(seed)
