@@ -118,6 +118,9 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# VSCode project settings
+.vscode/
+
 # Rope project settings
 .ropeproject
 
@@ -147,6 +150,7 @@ weights/
 *.onnx
 *.engine
 *.mlmodel
+*.mlpackage
 *.torchscript
 *.tflite
 *.h5
