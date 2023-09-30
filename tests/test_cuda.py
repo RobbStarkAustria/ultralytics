@@ -7,27 +7,51 @@ import torch
 
 from ultralytics import YOLO, download
 from ultralytics.utils import ASSETS, SETTINGS
+from ultralytics.utils.checks import cuda_device_count, cuda_is_available
 
-CUDA_IS_AVAILABLE = torch.cuda.is_available()
-CUDA_DEVICE_COUNT = torch.cuda.device_count()
+CUDA_IS_AVAILABLE = cuda_is_available()
+CUDA_DEVICE_COUNT = cuda_device_count()
 
 DATASETS_DIR = Path(SETTINGS['datasets_dir'])
 WEIGHTS_DIR = Path(SETTINGS['weights_dir'])
 MODEL = WEIGHTS_DIR / 'path with spaces' / 'yolov8n.pt'  # test spaces in path
 DATA = 'coco8.yaml'
+BUS = ASSETS / 'bus.jpg'
 
 
 def test_checks():
-    from ultralytics.utils.checks import cuda_device_count, cuda_is_available
-
-    assert cuda_device_count() == CUDA_DEVICE_COUNT
-    assert cuda_is_available() == CUDA_IS_AVAILABLE
+    assert torch.cuda.is_available() == CUDA_IS_AVAILABLE
+    assert torch.cuda.device_count() == CUDA_DEVICE_COUNT
 
 
 @pytest.mark.skipif(not CUDA_IS_AVAILABLE, reason='CUDA is not available')
 def test_train():
     device = 0 if CUDA_DEVICE_COUNT == 1 else [0, 1]
     YOLO(MODEL).train(data=DATA, imgsz=64, epochs=1, device=device)  # requires imgsz>=64
+
+
+@pytest.mark.skipif(not CUDA_IS_AVAILABLE, reason='CUDA is not available')
+def test_predict_multiple_devices():
+    model = YOLO('yolov8n.pt')
+    model = model.cpu()
+    assert str(model.device) == 'cpu'
+    _ = model(BUS)  # CPU inference
+    assert str(model.device) == 'cpu'
+
+    model = model.to('cuda:0')
+    assert str(model.device) == 'cuda:0'
+    _ = model(BUS)  # CUDA inference
+    assert str(model.device) == 'cuda:0'
+
+    model = model.cpu()
+    assert str(model.device) == 'cpu'
+    _ = model(BUS)  # CPU inference
+    assert str(model.device) == 'cpu'
+
+    model = model.cuda()
+    assert str(model.device) == 'cuda:0'
+    _ = model(BUS)  # CUDA inference
+    assert str(model.device) == 'cuda:0'
 
 
 @pytest.mark.skipif(not CUDA_IS_AVAILABLE, reason='CUDA is not available')
@@ -58,10 +82,10 @@ def test_predict_sam():
     model.info()
 
     # Run inference
-    model(ASSETS / 'bus.jpg', device=0)
+    model(BUS, device=0)
 
     # Run inference with bboxes prompt
-    model(ASSETS / 'zidane.jpg', bboxes=[439, 437, 524, 709], device=0)
+    model(BUS, bboxes=[439, 437, 524, 709], device=0)
 
     # Run inference with points prompt
     model(ASSETS / 'zidane.jpg', points=[900, 370], labels=[1], device=0)
@@ -71,7 +95,7 @@ def test_predict_sam():
     predictor = SAMPredictor(overrides=overrides)
 
     # Set image
-    predictor.set_image('ultralytics/assets/zidane.jpg')  # set with image file
+    predictor.set_image(ASSETS / 'zidane.jpg')  # set with image file
     # predictor(bboxes=[439, 437, 524, 709])
     # predictor(points=[900, 370], labels=[1])
 
@@ -94,7 +118,8 @@ def test_model_ray_tune():
 
 @pytest.mark.skipif(not CUDA_IS_AVAILABLE, reason='CUDA is not available')
 def test_model_tune():
-    YOLO('yolov8n.pt').tune(data='coco8.yaml', imgsz=32, epochs=1, iterations=2, plots=False, device='cpu')
+    YOLO('yolov8n-pose.pt').tune(data='coco8-pose.yaml', plots=False, imgsz=32, epochs=1, iterations=2, device='cpu')
+    YOLO('yolov8n-cls.pt').tune(data='imagenet10', plots=False, imgsz=32, epochs=1, iterations=2, device='cpu')
 
 
 @pytest.mark.skipif(not CUDA_IS_AVAILABLE, reason='CUDA is not available')
@@ -106,27 +131,22 @@ def test_pycocotools():
     # Download annotations after each dataset downloads first
     url = 'https://github.com/ultralytics/assets/releases/download/v0.0.0/'
 
-    validator = DetectionValidator(args={'model': 'yolov8n.pt', 'data': 'coco8.yaml', 'save_json': True, 'imgsz': 64})
+    args = {'model': 'yolov8n.pt', 'data': 'coco8.yaml', 'save_json': True, 'imgsz': 64}
+    validator = DetectionValidator(args=args)
     validator()
     validator.is_coco = True
     download(f'{url}instances_val2017.json', dir=DATASETS_DIR / 'coco8/annotations')
     _ = validator.eval_json(validator.stats)
 
-    validator = SegmentationValidator(args={
-        'model': 'yolov8n-seg.pt',
-        'data': 'coco8-seg.yaml',
-        'save_json': True,
-        'imgsz': 64})
+    args = {'model': 'yolov8n-seg.pt', 'data': 'coco8-seg.yaml', 'save_json': True, 'imgsz': 64}
+    validator = SegmentationValidator(args=args)
     validator()
     validator.is_coco = True
     download(f'{url}instances_val2017.json', dir=DATASETS_DIR / 'coco8-seg/annotations')
     _ = validator.eval_json(validator.stats)
 
-    validator = PoseValidator(args={
-        'model': 'yolov8n-pose.pt',
-        'data': 'coco8-pose.yaml',
-        'save_json': True,
-        'imgsz': 64})
+    args = {'model': 'yolov8n-pose.pt', 'data': 'coco8-pose.yaml', 'save_json': True, 'imgsz': 64}
+    validator = PoseValidator(args=args)
     validator()
     validator.is_coco = True
     download(f'{url}person_keypoints_val2017.json', dir=DATASETS_DIR / 'coco8-pose/annotations')

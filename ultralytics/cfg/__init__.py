@@ -1,7 +1,6 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
 
 import contextlib
-import re
 import shutil
 import sys
 from pathlib import Path
@@ -42,7 +41,7 @@ CLI_HELP_MSG = \
         yolo train data=coco128.yaml model=yolov8n.pt epochs=10 lr0=0.01
 
     2. Predict a YouTube video using a pretrained segmentation model at image size 320:
-        yolo predict model=yolov8n-seg.pt source='https://youtu.be/Zgi9g1ksQHc' imgsz=320
+        yolo predict model=yolov8n-seg.pt source='https://youtu.be/LNwODJXcvt4' imgsz=320
 
     3. Val a pretrained detection model at batch-size 1 and image size 640:
         yolo val model=yolov8n.pt data=coco128.yaml batch=1 imgsz=640
@@ -291,19 +290,20 @@ def handle_yolo_settings(args: List[str]) -> None:
 
 def parse_key_value_pair(pair):
     """Parse one 'key=value' pair and return key and value."""
-    re.sub(r' *= *', '=', pair)  # remove spaces around equals sign
     k, v = pair.split('=', 1)  # split on first '=' sign
+    k, v = k.strip(), v.strip()  # remove spaces
     assert v, f"missing '{k}' value"
     return k, smart_value(v)
 
 
 def smart_value(v):
     """Convert a string to an underlying type such as int, float, bool, etc."""
-    if v.lower() == 'none':
+    v_lower = v.lower()
+    if v_lower == 'none':
         return None
-    elif v.lower() == 'true':
+    elif v_lower == 'true':
         return True
-    elif v.lower() == 'false':
+    elif v_lower == 'false':
         return False
     else:
         with contextlib.suppress(Exception):
@@ -333,7 +333,7 @@ def entrypoint(debug=''):
 
     special = {
         'help': lambda: LOGGER.info(CLI_HELP_MSG),
-        'checks': checks.check_yolo,
+        'checks': checks.collect_system_info,
         'version': lambda: LOGGER.info(__version__),
         'settings': lambda: handle_yolo_settings(args[1:]),
         'cfg': lambda: yaml_print(DEFAULT_CFG_PATH),
@@ -358,7 +358,7 @@ def entrypoint(debug=''):
         if '=' in a:
             try:
                 k, v = parse_key_value_pair(a)
-                if k == 'cfg':  # custom.yaml passed
+                if k == 'cfg' and v is not None:  # custom.yaml passed
                     LOGGER.info(f'Overriding {DEFAULT_CFG_PATH} with {v}')
                     overrides = {k: val for k, val in yaml_load(checks.check_yaml(v)).items() if k != 'cfg'}
                 else:
@@ -442,8 +442,10 @@ def entrypoint(debug=''):
             LOGGER.warning(f"WARNING ⚠️ 'format' is missing. Using default 'format={overrides['format']}'.")
 
     # Run command in python
-    # getattr(model, mode)(**vars(get_cfg(overrides=overrides)))  # default args using default.yaml
     getattr(model, mode)(**overrides)  # default args from model
+
+    # Show help
+    LOGGER.info(f'💡 Learn more at https://docs.ultralytics.com/modes/{mode}')
 
 
 # Special modes --------------------------------------------------------------------------------------------------------
