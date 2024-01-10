@@ -8,7 +8,7 @@ from my_validation_classify import calculate_validation
 
 home_path = os.path.expanduser('~')
 
-sys.path.append(home_path + "/PycharmProjects/transfer_pytorch")
+sys.path.append(f"{home_path}/PycharmProjects/transfer_pytorch")
 
 
 with open("watchdog.txt", "w") as f:

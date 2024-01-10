@@ -12,7 +12,7 @@ with open("watchdog.txt", "w") as f:
     f.write("running")
     print("watchdog ready!")
 
-name = "2023_04_02_AdamW_lr_e-6"
+name = "staff"
 
 transfer_model = "yolov8m.pt"
 
@@ -27,11 +27,12 @@ model.train(
     project=f"{classes_string}",
     # project="hyper-parameter",
     name=f"{name}",
-    batch=-1,
+    batch=20,
     patience=0,
     epochs=65,
     device=0,
-    imgsz=1024,
+    imgsz=1408,
+    rect=True,
     optimizer="AdamW",
     max_det=1000,
     lr0=0.000001,
@@ -40,7 +41,6 @@ model.train(
     plots=True,
     cls=0.5,
     dfl=1.5,
-    fl_gamma=0.0,
     label_smoothing=0.0,
     nbs=64,
     hsv_h=0.015,

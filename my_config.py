@@ -27,7 +27,7 @@ factor_of_augmentation = 3
 
 note_group = ""
 # notes to train
-note_group ="diamant_notes"
+note_group ="diamond_notes"
 classes_to_train = ["fu-d", "fu-u",
                     "sb-min",
                     "mi-d", "mi-u",
