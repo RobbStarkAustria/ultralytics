@@ -29,10 +29,10 @@ There are two types of instance segmentation tracking available in the Ultralyti
 
 ## Samples
 
-|                                                          Instance Segmentation                                                          |                                                           Instance Segmentation + Object Tracking                                                            |
-| :-------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| ![Ultralytics Instance Segmentation](https://github.com/RizwanMunawar/ultralytics/assets/62513924/d4ad3499-1f33-4871-8fbc-1be0b2643aa2) | ![Ultralytics Instance Segmentation with Object Tracking](https://github.com/RizwanMunawar/ultralytics/assets/62513924/2e5c38cc-fd5c-4145-9682-fa94ae2010a0) |
-|                                                  Ultralytics Instance Segmentation 😍                                                   |                                                  Ultralytics Instance Segmentation with Object Tracking 🔥                                                   |
+|                                                        Instance Segmentation                                                         |                                                                  Instance Segmentation + Object Tracking                                                                  |
+| :----------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![Ultralytics Instance Segmentation](https://github.com/ultralytics/docs/releases/download/0/ultralytics-instance-segmentation.avif) | ![Ultralytics Instance Segmentation with Object Tracking](https://github.com/ultralytics/docs/releases/download/0/ultralytics-instance-segmentation-object-tracking.avif) |
+|                                                 Ultralytics Instance Segmentation 😍                                                 |                                                         Ultralytics Instance Segmentation with Object Tracking 🔥                                                         |
 
 !!! Example "Instance Segmentation and Tracking"
 
@@ -64,7 +64,9 @@ There are two types of instance segmentation tracking available in the Ultralyti
                 clss = results[0].boxes.cls.cpu().tolist()
                 masks = results[0].masks.xy
                 for mask, cls in zip(masks, clss):
-                    annotator.seg_bbox(mask=mask, mask_color=colors(int(cls), True), det_label=names[int(cls)])
+                    color = colors(int(cls), True)
+                    txt_color = annotator.get_txt_color(color)
+                    annotator.seg_bbox(mask=mask, mask_color=color, label=names[int(cls)], txt_color=txt_color)
 
             out.write(im0)
             cv2.imshow("instance-segmentation", im0)
@@ -110,7 +112,9 @@ There are two types of instance segmentation tracking available in the Ultralyti
                 track_ids = results[0].boxes.id.int().cpu().tolist()
 
                 for mask, track_id in zip(masks, track_ids):
-                    annotator.seg_bbox(mask=mask, mask_color=colors(track_id, True), track_label=str(track_id))
+                    color = colors(int(track_id), True)
+                    txt_color = annotator.get_txt_color(color)
+                    annotator.seg_bbox(mask=mask, mask_color=color, label=str(track_id), txt_color=txt_color)
 
             out.write(im0)
             cv2.imshow("instance-segmentation-object-tracking", im0)
@@ -125,12 +129,12 @@ There are two types of instance segmentation tracking available in the Ultralyti
 
 ### `seg_bbox` Arguments
 
-| Name          | Type    | Default         | Description                            |
-| ------------- | ------- | --------------- | -------------------------------------- |
-| `mask`        | `array` | `None`          | Segmentation mask coordinates          |
-| `mask_color`  | `tuple` | `(255, 0, 255)` | Mask color for every segmented box     |
-| `det_label`   | `str`   | `None`          | Label for segmented object             |
-| `track_label` | `str`   | `None`          | Label for segmented and tracked object |
+| Name         | Type    | Default         | Description                                  |
+| ------------ | ------- | --------------- | -------------------------------------------- |
+| `mask`       | `array` | `None`          | Segmentation mask coordinates                |
+| `mask_color` | `RGB`   | `(255, 0, 255)` | Mask color for every segmented box           |
+| `label`      | `str`   | `None`          | Label for segmented object                   |
+| `txt_color`  | `RGB`   | `None`          | Label color for segmented and tracked object |
 
 ## Note
 

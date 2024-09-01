@@ -15,12 +15,12 @@ Training a precise object detection model with oriented bounding boxes (OBB) req
 The YOLO OBB format designates bounding boxes by their four corner points with coordinates normalized between 0 and 1. It follows this format:
 
 ```bash
-class_index, x1, y1, x2, y2, x3, y3, x4, y4
+class_index x1 y1 x2 y2 x3 y3 x4 y4
 ```
 
 Internally, YOLO processes losses and outputs in the `xywhr` format, which represents the bounding box's center point (xy), width, height, and rotation.
 
-<p align="center"><img width="800" src="https://user-images.githubusercontent.com/26833433/259471881-59020fe2-09a4-4dcc-acce-9b0f7cfa40ee.png" alt="OBB format examples"></p>
+<p align="center"><img width="800" src="https://github.com/ultralytics/docs/releases/download/0/obb-format-examples.avif" alt="OBB format examples"></p>
 
 An example of a `*.txt` label file for the above image, which contains an object of class `0` in OBB format, could look like:
 
@@ -50,7 +50,7 @@ To train a model using these OBB formats:
 
         ```bash
         # Train a new YOLOv8n-OBB model on the DOTAv2 dataset
-        yolo detect train data=DOTAv1.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo obb train data=DOTAv1.yaml model=yolov8n-obb.pt epochs=100 imgsz=640
         ```
 
 ## Supported Datasets
@@ -125,7 +125,7 @@ Training a YOLOv8 model with OBBs involves ensuring your dataset is in the YOLO 
     
         ```bash
         # Train a new YOLOv8n-OBB model on the custom dataset
-        yolo detect train data=your_dataset.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo obb train data=your_dataset.yaml model=yolov8n-obb.yaml epochs=100 imgsz=640
         ```
         
 This ensures your model leverages the detailed OBB annotations for improved detection accuracy.

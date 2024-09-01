@@ -57,14 +57,14 @@ To train a YOLOv8n-pose model on the Tiger-Pose dataset for 100 epochs with an i
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo task=pose mode=train data=tiger-pose.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo task=pose mode=train data=tiger-pose.yaml model=yolov8n-pose.pt epochs=100 imgsz=640
         ```
 
 ## Sample Images and Annotations
 
 Here are some examples of images from the Tiger-Pose dataset, along with their corresponding annotations:
 
-<img src="https://user-images.githubusercontent.com/62513924/272491921-c963d2bf-505f-4a15-abd7-259de302cffa.jpg" alt="Dataset sample image" width="100%">
+<img src="https://github.com/ultralytics/docs/releases/download/0/mosaiced-training-batch-4.avif" alt="Dataset sample image" width="100%">
 
 - **Mosaiced Image**: This image demonstrates a training batch composed of mosaiced dataset images. Mosaicing is a technique used during training that combines multiple images into a single image to increase the variety of objects and scenes within each training batch. This helps improve the model's ability to generalize to different object sizes, aspect ratios, and contexts.
 
@@ -126,7 +126,7 @@ To train a YOLOv8n-pose model on the Tiger-Pose dataset for 100 epochs with an i
     
         ```bash
         # Start training from a pretrained *.pt model
-        yolo task=pose mode=train data=tiger-pose.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo task=pose mode=train data=tiger-pose.yaml model=yolov8n-pose.pt epochs=100 imgsz=640
         ```
 
 ### What configurations does the `tiger-pose.yaml` file include?

@@ -69,14 +69,14 @@ To train a YOLOv8n-seg model on the COCO-Seg dataset for 100 epochs with an imag
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=coco-seg.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo segment train data=coco-seg.yaml model=yolov8n-seg.pt epochs=100 imgsz=640
         ```
 
 ## Sample Images and Annotations
 
 COCO-Seg, like its predecessor COCO, contains a diverse set of images with various object categories and complex scenes. However, COCO-Seg introduces more detailed instance segmentation masks for each object in the images. Here are some examples of images from the dataset, along with their corresponding instance segmentation masks:
 
-![Dataset sample image](https://user-images.githubusercontent.com/26833433/239690696-93fa8765-47a2-4b34-a6e5-516d0d1c725b.jpg)
+![Dataset sample image](https://github.com/ultralytics/docs/releases/download/0/mosaiced-training-batch-3.avif)
 
 - **Mosaiced Image**: This image demonstrates a training batch composed of mosaiced dataset images. Mosaicing is a technique used during training that combines multiple images into a single image to increase the variety of objects and scenes within each training batch. This aids the model's ability to generalize to different object sizes, aspect ratios, and contexts.
 
@@ -131,7 +131,7 @@ To train a YOLOv8n-seg model on the COCO-Seg dataset for 100 epochs with an imag
     
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=coco-seg.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo segment train data=coco-seg.yaml model=yolov8n-seg.pt epochs=100 imgsz=640
         ```
 
 ### What are the key features of the COCO-Seg dataset?

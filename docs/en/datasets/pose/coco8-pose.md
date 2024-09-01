@@ -44,14 +44,14 @@ To train a YOLOv8n-pose model on the COCO8-Pose dataset for 100 epochs with an i
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=coco8-pose.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo pose train data=coco8-pose.yaml model=yolov8n-pose.pt epochs=100 imgsz=640
         ```
 
 ## Sample Images and Annotations
 
 Here are some examples of images from the COCO8-Pose dataset, along with their corresponding annotations:
 
-<img src="https://user-images.githubusercontent.com/26833433/236818283-52eecb96-fc6a-420d-8a26-d488b352dd4c.jpg" alt="Dataset sample image" width="800">
+<img src="https://github.com/ultralytics/docs/releases/download/0/mosaiced-training-batch-5.avif" alt="Dataset sample image" width="800">
 
 - **Mosaiced Image**: This image demonstrates a training batch composed of mosaiced dataset images. Mosaicing is a technique used during training that combines multiple images into a single image to increase the variety of objects and scenes within each training batch. This helps improve the model's ability to generalize to different object sizes, aspect ratios, and contexts.
 
@@ -105,7 +105,7 @@ To train a YOLOv8n-pose model on the COCO8-Pose dataset for 100 epochs with an i
     === "CLI"
     
         ```bash
-        yolo detect train data=coco8-pose.yaml model=yolov8n.pt epochs=100 imgsz=640
+        yolo pose train data=coco8-pose.yaml model=yolov8n-pose.pt epochs=100 imgsz=640
         ```
 
 For a comprehensive list of training arguments, refer to the model [Training](../../modes/train.md) page.

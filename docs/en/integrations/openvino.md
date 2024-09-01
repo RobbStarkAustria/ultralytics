@@ -6,7 +6,7 @@ keywords: YOLOv8, OpenVINO, model export, Intel, AI inference, CPU speedup, GPU 
 
 # Intel OpenVINO Export
 
-<img width="1024" src="https://github.com/RizwanMunawar/RizwanMunawar/assets/62513924/2b181f68-aa91-4514-ba09-497cc3c83b00" alt="OpenVINO Ecosystem">
+<img width="1024" src="https://github.com/ultralytics/docs/releases/download/0/openvino-ecosystem.avif" alt="OpenVINO Ecosystem">
 
 In this guide, we cover exporting YOLOv8 models to the [OpenVINO](https://docs.openvino.ai/) format, which can provide up to 3x [CPU](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/cpu-device.html) speedup, as well as accelerating YOLO inference on Intel [GPU](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/gpu-device.html) and [NPU](https://docs.openvino.ai/2024/openvino-workflow/running-inference/inference-devices-and-modes/npu-device.html) hardware.
 
@@ -59,11 +59,14 @@ Export a YOLOv8n model to OpenVINO format and run inference with the exported mo
 
 ## Arguments
 
-| Key      | Value        | Description                                          |
-| -------- | ------------ | ---------------------------------------------------- |
-| `format` | `'openvino'` | format to export to                                  |
-| `imgsz`  | `640`        | image size as scalar or (h, w) list, i.e. (640, 480) |
-| `half`   | `False`      | FP16 quantization                                    |
+| Key       | Value        | Description                                          |
+| --------- | ------------ | ---------------------------------------------------- |
+| `format`  | `'openvino'` | format to export to                                  |
+| `imgsz`   | `640`        | image size as scalar or (h, w) list, i.e. (640, 480) |
+| `half`    | `False`      | FP16 quantization                                    |
+| `int8`    | `False`      | INT8 quantization                                    |
+| `batch`   | `1`          | batch size for inference                             |
+| `dynamic` | `False`      | allows dynamic input sizes                           |
 
 ## Benefits of OpenVINO
 
@@ -115,7 +118,7 @@ The Intel® Data Center GPU Flex Series is a versatile and robust solution desig
 Benchmarks below run on Intel® Data Center GPU Flex 170 at FP32 precision.
 
 <div align="center">
-<img width="800" src="https://user-images.githubusercontent.com/26833433/253741543-62659bf8-1765-4d0b-b71c-8a4f9885506a.jpg" alt="Flex GPU benchmarks">
+<img width="800" src="https://github.com/ultralytics/docs/releases/download/0/flex-gpu-benchmarks.avif" alt="Flex GPU benchmarks">
 </div>
 
 | Model   | Format      | Status | Size (MB) | mAP50-95(B) | Inference time (ms/im) |
@@ -154,7 +157,7 @@ Early reviews have praised the Arc™ series, particularly the integrated A770M 
 Benchmarks below run on Intel® Arc 770 GPU at FP32 precision.
 
 <div align="center">
-<img width="800" src="https://user-images.githubusercontent.com/26833433/253741545-8530388f-8fd1-44f7-a4ae-f875d59dc282.jpg" alt="Arc GPU benchmarks">
+<img width="800" src="https://github.com/ultralytics/docs/releases/download/0/arc-gpu-benchmarks.avif" alt="Arc GPU benchmarks">
 </div>
 
 | Model   | Format      | Status | Size (MB) | metrics/mAP50-95(B) | Inference time (ms/im) |
@@ -189,7 +192,7 @@ Notably, Xeon® CPUs deliver high compute density and scalability, making them i
 Benchmarks below run on 4th Gen Intel® Xeon® Scalable CPU at FP32 precision.
 
 <div align="center">
-<img width="800" src="https://user-images.githubusercontent.com/26833433/253741546-dcd8e52a-fc38-424f-b87e-c8365b6f28dc.jpg" alt="Xeon CPU benchmarks">
+<img width="800" src="https://github.com/ultralytics/docs/releases/download/0/xeon-cpu-benchmarks.avif" alt="Xeon CPU benchmarks">
 </div>
 
 | Model   | Format      | Status | Size (MB) | metrics/mAP50-95(B) | Inference time (ms/im) |
@@ -222,7 +225,7 @@ The Intel® Core® series is a range of high-performance processors by Intel. Th
 Benchmarks below run on 13th Gen Intel® Core® i7-13700H CPU at FP32 precision.
 
 <div align="center">
-<img width="800" src="https://user-images.githubusercontent.com/26833433/254559985-727bfa43-93fa-4fec-a417-800f869f3f9e.jpg" alt="Core CPU benchmarks">
+<img width="800" src="https://github.com/ultralytics/docs/releases/download/0/core-cpu-benchmarks.avif" alt="Core CPU benchmarks">
 </div>
 
 | Model   | Format      | Status | Size (MB) | metrics/mAP50-95(B) | Inference time (ms/im) |
@@ -262,14 +265,14 @@ To reproduce the Ultralytics benchmarks above on all export [formats](../modes/e
         # Load a YOLOv8n PyTorch model
         model = YOLO("yolov8n.pt")
 
-        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all all export formats
+        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
         results = model.benchmarks(data="coco8.yaml")
         ```
 
     === "CLI"
 
         ```bash
-        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all all export formats
+        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
         yolo benchmark model=yolov8n.pt data=coco8.yaml
         ```
 
@@ -295,22 +298,22 @@ Exporting YOLOv8 models to the OpenVINO format can significantly enhance CPU spe
 
     === "Python"
 
-    ```python
-    from ultralytics import YOLO
+        ```python
+        from ultralytics import YOLO
 
-    # Load a YOLOv8n PyTorch model
-    model = YOLO("yolov8n.pt")
+        # Load a YOLOv8n PyTorch model
+        model = YOLO("yolov8n.pt")
 
-    # Export the model
-    model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
-    ```
+        # Export the model
+        model.export(format="openvino")  # creates 'yolov8n_openvino_model/'
+        ```
 
     === "CLI"
 
-    ```bash
-    # Export a YOLOv8n PyTorch model to OpenVINO format
-    yolo export model=yolov8n.pt format=openvino  # creates 'yolov8n_openvino_model/'
-    ```
+        ```bash
+        # Export a YOLOv8n PyTorch model to OpenVINO format
+        yolo export model=yolov8n.pt format=openvino  # creates 'yolov8n_openvino_model/'
+        ```
 
 For more information, refer to the [export formats documentation](../modes/export.md).
 
@@ -333,22 +336,22 @@ After exporting a YOLOv8 model to OpenVINO format, you can run inference using P
 
     === "Python"
 
-    ```python
-    from ultralytics import YOLO
+        ```python
+        from ultralytics import YOLO
 
-    # Load the exported OpenVINO model
-    ov_model = YOLO("yolov8n_openvino_model/")
+        # Load the exported OpenVINO model
+        ov_model = YOLO("yolov8n_openvino_model/")
 
-    # Run inference
-    results = ov_model("https://ultralytics.com/images/bus.jpg")
-    ```
+        # Run inference
+        results = ov_model("https://ultralytics.com/images/bus.jpg")
+        ```
 
     === "CLI"
 
-    ```bash
-    # Run inference with the exported model
-    yolo predict model=yolov8n_openvino_model source='https://ultralytics.com/images/bus.jpg'
-    ```
+        ```bash
+        # Run inference with the exported model
+        yolo predict model=yolov8n_openvino_model source='https://ultralytics.com/images/bus.jpg'
+        ```
 
 Refer to our [predict mode documentation](../modes/predict.md) for more details.
 
@@ -370,21 +373,21 @@ Yes, you can benchmark YOLOv8 models in various formats including PyTorch, Torch
 
     === "Python"
 
-    ```python
-    from ultralytics import YOLO
+        ```python
+        from ultralytics import YOLO
 
-    # Load a YOLOv8n PyTorch model
-    model = YOLO("yolov8n.pt")
+        # Load a YOLOv8n PyTorch model
+        model = YOLO("yolov8n.pt")
 
-    # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
-    results = model.benchmarks(data="coco8.yaml")
-    ```
+        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
+        results = model.benchmarks(data="coco8.yaml")
+        ```
 
     === "CLI"
 
-    ```bash
-    # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
-    yolo benchmark model=yolov8n.pt data=coco8.yaml
-    ```
+        ```bash
+        # Benchmark YOLOv8n speed and accuracy on the COCO8 dataset for all export formats
+        yolo benchmark model=yolov8n.pt data=coco8.yaml
+        ```
 
 For detailed benchmark results, refer to our [benchmarks section](#openvino-yolov8-benchmarks) and [export formats](../modes/export.md) documentation.

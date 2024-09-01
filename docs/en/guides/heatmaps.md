@@ -29,10 +29,10 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 
 ## Real World Applications
 
-|                                                                 Transportation                                                                  |                                                                 Retail                                                                  |
-| :---------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------: |
-| ![Ultralytics YOLOv8 Transportation Heatmap](https://github.com/RizwanMunawar/ultralytics/assets/62513924/288d7053-622b-4452-b4e4-1f41aeb764aa) | ![Ultralytics YOLOv8 Retail Heatmap](https://github.com/RizwanMunawar/ultralytics/assets/62513924/edef75ad-50a7-4c0a-be4a-a66cdfc12802) |
-|                                                    Ultralytics YOLOv8 Transportation Heatmap                                                    |                                                    Ultralytics YOLOv8 Retail Heatmap                                                    |
+|                                                                    Transportation                                                                    |                                                                Retail                                                                |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: |
+| ![Ultralytics YOLOv8 Transportation Heatmap](https://github.com/ultralytics/docs/releases/download/0/ultralytics-yolov8-transportation-heatmap.avif) | ![Ultralytics YOLOv8 Retail Heatmap](https://github.com/ultralytics/docs/releases/download/0/ultralytics-yolov8-retail-heatmap.avif) |
+|                                                      Ultralytics YOLOv8 Transportation Heatmap                                                       |                                                  Ultralytics YOLOv8 Retail Heatmap                                                   |
 
 !!! tip "Heatmap Configuration"
 
@@ -61,7 +61,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             colormap=cv2.COLORMAP_PARULA,
             view_img=True,
             shape="circle",
-            classes_names=model.names,
+            names=model.names,
         )
 
         while cap.isOpened():
@@ -102,7 +102,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             view_img=True,
             shape="circle",
             count_reg_pts=line_points,
-            classes_names=model.names,
+            names=model.names,
         )
 
         while cap.isOpened():
@@ -144,7 +144,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             view_img=True,
             shape="circle",
             count_reg_pts=region_points,
-            classes_names=model.names,
+            names=model.names,
         )
 
         while cap.isOpened():
@@ -186,7 +186,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             view_img=True,
             shape="circle",
             count_reg_pts=region_points,
-            classes_names=model.names,
+            names=model.names,
         )
 
         while cap.isOpened():
@@ -221,7 +221,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             colormap=cv2.COLORMAP_PARULA,
             view_img=True,
             shape="circle",
-            classes_names=model.names,
+            names=model.names,
         )
 
         results = model.track(im0, persist=True)
@@ -251,7 +251,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
             colormap=cv2.COLORMAP_PARULA,
             view_img=True,
             shape="circle",
-            classes_names=model.names,
+            names=model.names,
         )
 
         while cap.isOpened():
@@ -273,7 +273,7 @@ A heatmap generated with [Ultralytics YOLOv8](https://github.com/ultralytics/ult
 
 | Name               | Type             | Default            | Description                                                       |
 | ------------------ | ---------------- | ------------------ | ----------------------------------------------------------------- |
-| `classes_names`    | `dict`           | `None`             | Dictionary of class names.                                        |
+| `names`            | `list`           | `None`             | Dictionary of class names.                                        |
 | `imw`              | `int`            | `0`                | Image width.                                                      |
 | `imh`              | `int`            | `0`                | Image height.                                                     |
 | `colormap`         | `int`            | `cv2.COLORMAP_JET` | Colormap to use for the heatmap.                                  |
@@ -348,7 +348,7 @@ from ultralytics import YOLO, solutions
 
 model = YOLO("yolov8n.pt")
 cap = cv2.VideoCapture("path/to/video/file.mp4")
-heatmap_obj = solutions.Heatmap(colormap=cv2.COLORMAP_PARULA, view_img=True, shape="circle", classes_names=model.names)
+heatmap_obj = solutions.Heatmap(colormap=cv2.COLORMAP_PARULA, view_img=True, shape="circle", names=model.names)
 
 while cap.isOpened():
     success, im0 = cap.read()
@@ -381,7 +381,7 @@ from ultralytics import YOLO, solutions
 
 model = YOLO("yolov8n.pt")
 cap = cv2.VideoCapture("path/to/video/file.mp4")
-heatmap_obj = solutions.Heatmap(colormap=cv2.COLORMAP_PARULA, view_img=True, shape="circle", classes_names=model.names)
+heatmap_obj = solutions.Heatmap(colormap=cv2.COLORMAP_PARULA, view_img=True, shape="circle", names=model.names)
 
 classes_for_heatmap = [0, 2]  # Classes to visualize
 while cap.isOpened():
