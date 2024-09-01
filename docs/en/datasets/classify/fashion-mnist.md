@@ -74,14 +74,14 @@ To train a CNN model on the Fashion-MNIST dataset for 100 epochs with an image s
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=fashion-mnist model=yolov8n-cls.pt epochs=100 imgsz=28
+        yolo classify train data=fashion-mnist model=yolov8n-cls.pt epochs=100 imgsz=28
         ```
 
 ## Sample Images and Annotations
 
 The Fashion-MNIST dataset contains grayscale images of Zalando's article images, providing a well-structured dataset for image classification tasks. Here are some examples of images from the dataset:
 
-![Dataset sample image](https://user-images.githubusercontent.com/26833433/239359139-ce0a434e-9056-43e0-a306-3214f193dcce.png)
+![Dataset sample image](https://github.com/ultralytics/docs/releases/download/0/fashion-mnist-sample.avif)
 
 The example showcases the variety and complexity of the images in the Fashion-MNIST dataset, highlighting the importance of a diverse dataset for training robust image classification models.
 
@@ -117,7 +117,7 @@ To train an Ultralytics YOLO model on the Fashion-MNIST dataset, you can use bot
     === "CLI"
     
         ```bash
-        yolo detect train data=fashion-mnist model=yolov8n-cls.pt epochs=100 imgsz=28
+        yolo classify train data=fashion-mnist model=yolov8n-cls.pt epochs=100 imgsz=28
         ```
 
 For more detailed training parameters, refer to the [Training page](../../modes/train.md).

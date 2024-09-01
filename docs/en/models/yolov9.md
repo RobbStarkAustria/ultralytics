@@ -19,7 +19,7 @@ YOLOv9 marks a significant advancement in real-time object detection, introducin
   <strong>Watch:</strong> YOLOv9 Training on Custom Data using Ultralytics | Industrial Package Dataset
 </p>
 
-![YOLOv9 performance comparison](https://github.com/ultralytics/ultralytics/assets/26833433/9f41ef7b-6008-43eb-8ba1-0a9b89600100)
+![YOLOv9 performance comparison](https://github.com/ultralytics/docs/releases/download/0/yolov9-performance-comparison.avif)
 
 ## Introduction to YOLOv9
 
@@ -61,7 +61,28 @@ PGI is a novel concept introduced in YOLOv9 to combat the information bottleneck
 
 GELAN represents a strategic architectural advancement, enabling YOLOv9 to achieve superior parameter utilization and computational efficiency. Its design allows for flexible integration of various computational blocks, making YOLOv9 adaptable to a wide range of applications without sacrificing speed or accuracy.
 
-![YOLOv9 architecture comparison](https://github.com/ultralytics/ultralytics/assets/26833433/286a3971-677b-45e6-a90b-4b6bd565a7af)
+![YOLOv9 architecture comparison](https://github.com/ultralytics/docs/releases/download/0/yolov9-architecture-comparison.avif)
+
+## YOLOv9 Benchmarks
+
+Benchmarking in YOLOv9 using [Ultralytics](https://docs.ultralytics.com/modes/benchmark/) involves evaluating the performance of your trained and validated model in real-world scenarios. This process includes:
+
+- **Performance Evaluation:** Assessing the model's speed and accuracy.
+- **Export Formats:** Testing the model across different export formats to ensure it meets the necessary standards and performs well in various environments.
+- **Framework Support:** Providing a comprehensive framework within Ultralytics YOLOv8 to facilitate these assessments and ensure consistent and reliable results.
+
+By benchmarking, you can ensure that your model not only performs well in controlled testing environments but also maintains high performance in practical, real-world applications.
+
+<p align="center">
+  <br>
+  <iframe loading="lazy" width="720" height="405" src="https://www.youtube.com/embed/ziJR01lKnio"
+    title="YouTube video player" frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
+  <br>
+  <strong>Watch:</strong> How to Benchmark the YOLOv9 Model Using the Ultralytics Python Package
+</p>
 
 ## Performance on MS COCO Dataset
 
@@ -169,7 +190,7 @@ We would like to acknowledge the YOLOv9 authors for their significant contributi
 
         ```bibtex
         @article{wang2024yolov9,
-          title={{YOLOv9}: Learning What You Want to Learn Using Programmable Gradient Information},
+          title={YOLOv9: Learning What You Want to Learn Using Programmable Gradient Information},
           author={Wang, Chien-Yao  and Liao, Hong-Yuan Mark},
           booktitle={arXiv preprint arXiv:2402.13616},
           year={2024}

@@ -8,6 +8,17 @@ keywords: Caltech-256 dataset, object classification, image dataset, machine lea
 
 The [Caltech-256](https://data.caltech.edu/records/nyy15-4j048) dataset is an extensive collection of images used for object classification tasks. It contains around 30,000 images divided into 257 categories (256 object categories and 1 background category). The images are carefully curated and annotated to provide a challenging and diverse benchmark for object recognition algorithms.
 
+<p align="center">
+  <br>
+  <iframe loading="lazy" width="720" height="405" src="https://www.youtube.com/embed/isc06_9qnM0"
+    title="YouTube video player" frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+  </iframe>
+  <br>
+  <strong>Watch:</strong> How to Train Image Classification Model using Caltech-256 Dataset with Ultralytics HUB
+</p>
+
 ## Key Features
 
 - The Caltech-256 dataset comprises around 30,000 color images divided into 257 categories.
@@ -46,14 +57,14 @@ To train a YOLO model on the Caltech-256 dataset for 100 epochs, you can use the
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=caltech256 model=yolov8n-cls.pt epochs=100 imgsz=416
+        yolo classify train data=caltech256 model=yolov8n-cls.pt epochs=100 imgsz=416
         ```
 
 ## Sample Images and Annotations
 
 The Caltech-256 dataset contains high-quality color images of various objects, providing a comprehensive dataset for object recognition tasks. Here are some examples of images from the dataset ([credit](https://ml4a.github.io/demos/tsne_viewer.html)):
 
-![Dataset sample image](https://user-images.githubusercontent.com/26833433/239365061-1e5f7857-b1e8-44ca-b3d7-d0befbcd33f9.jpg)
+![Dataset sample image](https://github.com/ultralytics/docs/releases/download/0/caltech256-sample-image.avif)
 
 The example showcases the diversity and complexity of the objects in the Caltech-256 dataset, emphasizing the importance of a varied dataset for training robust object recognition models.
 
@@ -105,7 +116,7 @@ To train a YOLO model on the Caltech-256 dataset for 100 epochs, you can use the
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=caltech256 model=yolov8n-cls.pt epochs=100 imgsz=416
+        yolo classify train data=caltech256 model=yolov8n-cls.pt epochs=100 imgsz=416
         ```
 
 ### What are the most common use cases for the Caltech-256 dataset?

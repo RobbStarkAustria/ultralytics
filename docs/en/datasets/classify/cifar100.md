@@ -49,14 +49,14 @@ To train a YOLO model on the CIFAR-100 dataset for 100 epochs with an image size
 
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=cifar100 model=yolov8n-cls.pt epochs=100 imgsz=32
+        yolo classify train data=cifar100 model=yolov8n-cls.pt epochs=100 imgsz=32
         ```
 
 ## Sample Images and Annotations
 
 The CIFAR-100 dataset contains color images of various objects, providing a well-structured dataset for image classification tasks. Here are some examples of images from the dataset:
 
-![Dataset sample image](https://user-images.githubusercontent.com/26833433/239363319-62ebf02f-7469-4178-b066-ccac3cd334db.jpg)
+![Dataset sample image](https://github.com/ultralytics/docs/releases/download/0/cifar100-sample-image.avif)
 
 The example showcases the variety and complexity of the objects in the CIFAR-100 dataset, highlighting the importance of a diverse dataset for training robust image classification models.
 
@@ -107,7 +107,7 @@ You can train a YOLO model on the CIFAR-100 dataset using either Python or CLI c
         
         ```bash
         # Start training from a pretrained *.pt model
-        yolo detect train data=cifar100 model=yolov8n-cls.pt epochs=100 imgsz=32
+        yolo classify train data=cifar100 model=yolov8n-cls.pt epochs=100 imgsz=32
         ```
 
 For a comprehensive list of available arguments, please refer to the model [Training](../../modes/train.md) page.
