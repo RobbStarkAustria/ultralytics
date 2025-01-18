@@ -1,0 +1,15 @@
+path: ../datasets/note_sheets
+train: train.txt
+val: validation.txt
+test: test.txt
+names:
+  0: fu-d
+  1: fu-u
+  2: sb-min
+  3: mi-d
+  4: mi-u
+  5: sebre
+  6: sm-d
+  7: sm-u
+  8: sf-d
+  9: sf-u

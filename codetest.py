@@ -1,7 +1,8 @@
 import ultralytics
-from ultralytics import YOLO
+from ultralytics import YOLO, settings
 
 ultralytics.checks()
+print(settings)
 
 model = YOLO("yolov8n.pt")  # load a pretrained model (recommended for training)
 
