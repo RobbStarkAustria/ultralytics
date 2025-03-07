@@ -760,28 +760,12 @@ class EarlyStopping:
         if fitness is None:  # check if fitness=None (happens when val=False)
             return False
 
-<<<<<<< HEAD
-        improvement = False
-        if fitness >= self.best_fitness:  # >= 0 to allow for early zero-fitness stage of training
-            improvement = True
-            LOGGER.info(f"fitness improves from {self.best_fitness} to {fitness}!")
-=======
         if fitness > self.best_fitness or self.best_fitness == 0:  # allow for early zero-fitness stage of training
->>>>>>> afbc0524d0a4ab923b81601132aa2d1055de922d
             self.best_epoch = epoch
             self.best_fitness = fitness
         delta = epoch - self.best_epoch  # epochs without improvement
         self.possible_stop = delta >= (self.patience - 1)  # possible stop may occur next epoch
         stop = delta >= self.patience  # stop training if patience exceeded
-
-        if not improvement:
-            if delta == 1:
-                ep = "epoch"
-            else:
-                ep = "epochs"
-            
-            LOGGER.info(f"fitness {fitness} does not improve from {self.best_fitness} for {delta} {ep}. patience: {self.patience}")
-
         if stop:
             prefix = colorstr("EarlyStopping: ")
             LOGGER.info(
