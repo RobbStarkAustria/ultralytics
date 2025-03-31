@@ -781,11 +781,7 @@ class Metric(SimpleClass):
         return maps
 
     def fitness(self):
-<<<<<<< HEAD
-        # Model fitness as a weighted combination of metrics
-=======
         """Return model fitness as a weighted combination of metrics."""
->>>>>>> 5946277a1d08d1ba2ddd525adb52e73c29abf116
         w = [0.0, 0.0, 0.1, 0.9]  # weights for [P, R, mAP@0.5, mAP@0.5:0.95]
         return (np.array(self.mean_results()) * w).sum()
 
